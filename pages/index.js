@@ -1,5 +1,6 @@
 import Layout from '../components/Layout'
 import Link from 'next/link'
+import fetch from 'isomorphic-unfetch'
 
 const PostLink = (props) => (
     <li>
@@ -9,15 +10,29 @@ const PostLink = (props) => (
     </li>
 )
 
-const Index = () => (
+const Index = (props) => (
     <Layout>
-        <h1>Mi Blog</h1>
+        <h1>Mi Batman TV Show</h1>
         <ul>
-            <PostLink id="hello-hextjs" title="hola Next.js" />
-            <PostLink id="learn-nextjs" title="Aprender Next.js es sorprendente!" />
-            <PostLink id="deploy-nextjs" title="Desplegar Apps con Zeit" />
+            {props.shows.map(({show}) => (
+                <li key={show.id}>
+                    <Link as={`/p/${show.id}`} href={`/post?id=${show.id}`}>
+                        <a>{show.name}</a>
+                    </Link>
+                </li>
+            ))}
         </ul>
     </Layout>
 )
 
+Index.getInitialProps = async function() {
+    const res = await fetch('https://api.tvmaze.com/search/shows?q=batman')
+    const data = await res.json()
+
+    console.log(`Mostrar datos obtenidos (fetched). Count: ${data.length}`)
+
+    return {
+        shows: data
+    }
+}
 export default Index
